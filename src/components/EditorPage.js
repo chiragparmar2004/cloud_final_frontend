@@ -74,8 +74,32 @@ const EditorPage = () => {
     }
     console.log("2nd useEffect");
 
-    const socketInstance = io("http://localhost:5000");
-    setSocket(socketInstance);
+async function getAvailableServer() {
+    const servers = ["http://localhost:5000", "http://13.53.130.167:5000"];
+    
+    for (const server of servers) {
+        try {
+            const response = await fetch(server, { method: "HEAD" });
+            if (response.ok) {
+                return server;
+            }
+        } catch (error) {
+            // Server not reachable, continue to the next one
+        }
+    }
+    throw new Error("No servers are available");
+}
+
+(async () => {
+    try {
+        const serverUrl = await getAvailableServer();
+        const socketInstance = io(serverUrl);
+        setSocket(socketInstance);
+        console.log("Connected to", serverUrl);
+    } catch (error) {
+        console.error(error.message);
+    }
+})();    
 
     socketInstance.on("connect", () => {
       console.log("Socket connected, joining room with ID:", roomId);
