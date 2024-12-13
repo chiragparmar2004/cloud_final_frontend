@@ -90,16 +90,17 @@ async function getAvailableServer() {
     throw new Error("No servers are available");
 }
 
+let socketInstance;
 (async () => {
-    try {
+try {
         const serverUrl = await getAvailableServer();
-        const socketInstance = io(serverUrl);
+        socketInstance = io(serverUrl);
         setSocket(socketInstance);
         console.log("Connected to", serverUrl);
-    } catch (error) {
+} catch (error) {
         console.error(error.message);
-    }
-})();    
+}
+})();
 
     socketInstance.on("connect", () => {
       console.log("Socket connected, joining room with ID:", roomId);
